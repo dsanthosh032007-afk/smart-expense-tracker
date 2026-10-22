@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Expense Tracker | College Mini Project</title>
+  <meta name="description" content="A simple, modern, and complete college mini project for personal finance tracking built with pure HTML, CSS, and Vanilla JavaScript with LocalStorage.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="3"></rect>
+            <path d="M7 15h0M2 10h20"></path>
+            <circle cx="16" cy="15" r="1.5"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Smart Expense Tracker</h1>
+          <span class="project-tag">College Mini-Project &bull; Vanilla JS &amp; LocalStorage</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Currency Selector -->
+        <div class="currency-picker">
+          <label for="currencySelect" class="visually-hidden">Select Currency</label>
+          <span class="currency-symbol-label">Currency:</span>
+          <select id="currencySelect" title="Change Currency Symbol">
+            <option value="₹" selected>₹ (INR)</option>
+            <option value="$">$ (USD)</option>
+            <option value="€">€ (EUR)</option>
+            <option value="£">£ (GBP)</option>
+          </select>
+        </div>
+
+        <!-- Demo Data & Clear Buttons -->
+        <button id="btnLoadDemo" class="btn btn-secondary btn-sm" title="Restore sample transactions">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+            <path d="M16 21h5v-5"></path>
+          </svg>
+          Load Demo
+        </button>
+
+        <button id="btnClearAll" class="btn btn-danger-outline btn-sm" title="Clear all saved transactions">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear All
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    
+    <!-- Balance & Summary Cards (KPIs) -->
+    <section class="kpi-grid" aria-label="Financial Summary Cards">
+      
+      <!-- Balance Card -->
+      <div class="kpi-card balance-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Balance</span>
+          <span class="kpi-icon balance-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </span>
+        </div>
+        <div class="kpi-value-wrapper">
+          <h2 id="totalBalance" class="kpi-value">₹0.00</h2>
+          <span id="balanceStatusBadge" class="status-badge badge-neutral">Neutral</span>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-subtext" id="savingsRateText">Savings Rate: 0%</span>
+        </div>
+      </div>
+
+      <!-- Income Card -->
+      <div class="kpi-card income-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Income</span>
+          <span class="kpi-icon income-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </span>
+        </div>
+        <div class="kpi-value-wrapper">
+          <h2 id="totalIncome" class="kpi-value text-income">₹0.00</h2>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-subtext" id="incomeCountText">0 transactions</span>
+        </div>
+      </div>
+
+      <!-- Expense Card -->
+      <div class="kpi-card expense-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Total Expenses</span>
+          <span class="kpi-icon expense-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+              <polyline points="17 18 23 18 23 12"></polyline>
+            </svg>
+          </span>
+        </div>
+        <div class="kpi-value-wrapper">
+          <h2 id="totalExpense" class="kpi-value text-expense">₹0.00</h2>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-subtext" id="expenseCountText">0 transactions</span>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Card -->
+      <div class="kpi-card count-card">
+        <div class="kpi-header">
+          <span class="kpi-title">Transactions</span>
+          <span class="kpi-icon count-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+          </span>
+        </div>
+        <div class="kpi-value-wrapper">
+          <h2 id="totalTransactions" class="kpi-value">0</h2>
+        </div>
+        <div class="kpi-footer">
+          <span class="kpi-subtext" id="topCategorySummary">Top: None</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Main Workspace Two-Column Layout -->
+    <div class="dashboard-grid">
+
+      <!-- Left Column: Add Transaction & Category Spending Breakdown -->
+      <aside class="dashboard-sidebar">
+        
+        <!-- Add Transaction Form Card -->
+        <div class="card form-card">
+          <div class="card-header">
+            <h3>Add New Transaction</h3>
+            <p class="card-subtitle">Track your daily income or expenses</p>
+          </div>
+
+          <form id="transactionForm" novalidate>
+            <!-- Transaction Type Switcher -->
+            <div class="form-group">
+              <label class="form-label">Transaction Type</label>
+              <div class="type-toggle-group" role="radiogroup" aria-label="Transaction Type">
+                <button type="button" class="btn-toggle active" data-type="expense" id="typeExpenseBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                  </svg>
+                  Expense
+                </button>
+                <button type="button" class="btn-toggle" data-type="income" id="typeIncomeBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                  </svg>
+                  Income
+                </button>
+              </div>
+              <input type="hidden" id="transactionType" value="expense">
+            </div>
+
+            <!-- Title Input -->
+            <div class="form-group">
+              <label for="transactionTitle" class="form-label">
+                Title / Description <span class="required">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="transactionTitle" 
+                class="form-control" 
+                placeholder="e.g., Grocery Shopping, Semester Books" 
+                maxlength="60" 
+                required
+              >
+              <small class="error-msg" id="titleError"></small>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+              <label for="transactionAmount" class="form-label">
+                Amount (<span class="currency-label-dynamic">₹</span>) <span class="required">*</span>
+              </label>
+              <div class="input-with-symbol">
+                <span class="input-symbol currency-label-dynamic">₹</span>
+                <input 
+                  type="number" 
+                  id="transactionAmount" 
+                  class="form-control input-has-symbol" 
+                  placeholder="0.00" 
+                  step="0.01" 
+                  min="0.01" 
+                  max="100000000"
+                  required
+                >
+              </div>
+              <small class="error-msg" id="amountError"></small>
+            </div>
+
+            <!-- Category & Date Row -->
+            <div class="form-row">
+              <div class="form-group col-half">
+                <label for="transactionCategory" class="form-label">
+                  Category <span class="required">*</span>
+                </label>
+                <select id="transactionCategory" class="form-control" required>
+                  <!-- Populated dynamically based on type (Income/Expense) -->
+                </select>
+                <small class="error-msg" id="categoryError"></small>
+              </div>
+
+              <div class="form-group col-half">
+                <label for="transactionDate" class="form-label">
+                  Date <span class="required">*</span>
+                </label>
+                <input 
+                  type="date" 
+                  id="transactionDate" 
+                  class="form-control" 
+                  required
+                >
+                <small class="error-msg" id="dateError"></small>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btnAddTransaction" class="btn btn-primary btn-block">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+              Add Transaction
+            </button>
+          </form>
+        </div>
+
+        <!-- Spending Summary & Category Breakdown Card -->
+        <div class="card summary-card">
+          <div class="card-header">
+            <h3>Spending Summary</h3>
+            <p class="card-subtitle">Expense distribution by category</p>
+          </div>
+          <div id="spendingSummaryList" class="category-breakdown-list">
+            <!-- Dynamically populated category bars -->
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Right Column: Filters & Transaction History Table -->
+      <section class="dashboard-main">
+        
+        <div class="card history-card">
+          <div class="card-header history-header">
+            <div>
+              <h3>Transaction History</h3>
+              <p class="card-subtitle" id="historySubtitle">Showing all recorded items</p>
+            </div>
+            
+            <div class="table-quick-actions">
+              <button id="btnExportCsv" class="btn btn-secondary btn-sm" title="Export transactions to a CSV file">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls Toolbar -->
+          <div class="filter-toolbar">
+            
+            <!-- Search Input -->
+            <div class="search-box">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input 
+                type="text" 
+                id="searchTransactions" 
+                placeholder="Search by title or category..." 
+                class="form-control search-input"
+              >
+              <button type="button" id="btnClearSearch" class="btn-clear-search" title="Clear search" style="display: none;">
+                &times;
+              </button>
+            </div>
+
+            <!-- Filter Controls Group -->
+            <div class="filter-controls">
+              
+              <!-- Type Filter Tabs -->
+              <div class="segmented-control" role="group" aria-label="Filter by type">
+                <button type="button" class="segment-btn active" data-type-filter="all">All</button>
+                <button type="button" class="segment-btn" data-type-filter="expense">Expenses</button>
+                <button type="button" class="segment-btn" data-type-filter="income">Income</button>
+              </div>
+
+              <!-- Category Filter Dropdown -->
+              <div class="select-filter-wrap">
+                <select id="filterCategory" class="form-control select-filter" title="Filter by category">
+                  <option value="all">All Categories</option>
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+
+              <!-- Sort Order Dropdown -->
+              <div class="select-filter-wrap">
+                <select id="sortBy" class="form-control select-filter" title="Sort transactions">
+                  <option value="date-desc">Date (Newest First)</option>
+                  <option value="date-asc">Date (Oldest First)</option>
+                  <option value="amount-desc">Amount (High to Low)</option>
+                  <option value="amount-asc">Amount (Low to High)</option>
+                </select>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Active Filter Pill Indicator -->
+          <div id="activeFilterNotice" class="active-filter-notice" style="display: none;">
+            <span id="filterNoticeText">Filtering applied</span>
+            <button type="button" id="btnResetFilters" class="btn-reset-filters">Reset Filters</button>
+          </div>
+
+          <!-- Transactions Table Container -->
+          <div class="table-responsive">
+            <table class="transaction-table" id="transactionTable">
+              <thead>
+                <tr>
+                  <th scope="col" class="th-date">Date</th>
+                  <th scope="col" class="th-details">Details</th>
+                  <th scope="col" class="th-category">Category</th>
+                  <th scope="col" class="th-type">Type</th>
+                  <th scope="col" class="th-amount text-right">Amount</th>
+                  <th scope="col" class="th-actions text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="transactionListBody">
+                <!-- Transaction rows dynamically rendered here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty State (Shown when no items exist or match filter) -->
+          <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                <line x1="2" y1="10" x2="22" y2="10"></line>
+              </svg>
+            </div>
+            <h4 id="emptyStateTitle">No Transactions Found</h4>
+            <p id="emptyStateDesc">Add your first transaction using the form on the left or click "Load Demo" above.</p>
+          </div>
+
+          <!-- Table Footer / Count summary -->
+          <div class="table-footer">
+            <span id="filteredItemsCount">Showing 0 transactions</span>
+            <span id="filteredSumLabel" class="filtered-sum"></span>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- College Project Information Footer Section -->
+    <footer class="project-info-footer">
+      <div class="footer-card">
+        <div class="footer-header">
+          <h4>🎓 About This College Mini-Project</h4>
+          <span class="badge badge-accent">Academic Showcase</span>
+        </div>
+        <p class="footer-desc">
+          <strong>Smart Expense Tracker</strong> is a client-side personal finance manager. It demonstrates core web development fundamentals:
+          <strong>Semantic HTML5</strong> structure, <strong>Modern CSS Flexbox &amp; Grid</strong> design system, 
+          and <strong>Vanilla JavaScript (ES6)</strong> for state management, dynamic DOM rendering, real-time filtering, mathematical aggregation, and persistence using the browser's <code>localStorage</code> API.
+        </p>
+        <div class="feature-tags">
+          <span class="tag">&check; 100% Client-side</span>
+          <span class="tag">&check; No Backend Required</span>
+          <span class="tag">&check; Instant LocalStorage Sync</span>
+          <span class="tag">&check; Responsive Design</span>
+          <span class="tag">&check; Input Validation &amp; Error Prevention</span>
+          <span class="tag">&check; CSV Export</span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="confirmModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">Confirm Action</h3>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessage">Are you sure you want to proceed?</p>
+      </div>
+      <div class="modal-actions">
+        <button id="modalBtnCancel" class="btn btn-secondary">Cancel</button>
+        <button id="modalBtnConfirm" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
